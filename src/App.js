@@ -22,8 +22,10 @@ class App extends React.Component {
         lettersToFind: this.generateLetterArray(),
         alphabet: this.generateArrayAlphabet(),
         matchedLetter: [],
+        playedLetter: [],
         message: '',
         counter: 0,
+        win: null,
     }
 
     generateArrayAlphabet() {
@@ -43,19 +45,43 @@ class App extends React.Component {
 
     handleAlphabetClick = (index) => {
 
-        let { alphabet, lettersToFind, matchedLetter, counter } = this.state
+        let { alphabet, lettersToFind, matchedLetter, counter, playedLetter } = this.state
+
+        if (10 >= counter ) {
+            this.handleEndgame();
+            console.log('JE suis ton père')
+        }
 
         let letter = alphabet[index];
-        if (lettersToFind.includes(letter)) {
+
+        if (playedLetter.includes(letter)) {
+
+            this.setState( { message: 'Cette lettre a déjà été jouée'});
+
+        } else if (lettersToFind.includes(letter)) {
+            playedLetter.push(letter);
             matchedLetter.push(letter);
             counter += 1;
-            this.setState( { matchedLetter: matchedLetter, message: '', counter: counter })
+            this.setState( { matchedLetter: matchedLetter, message: '', counter: counter, playedLetter: playedLetter })
         } else {
+
+            playedLetter.push(letter);
             counter += 1;
-            this.setState( { message: 'Cette lettre n\'appartient pas au mot recherché', counter: counter })
+            this.setState( { message: 'Cette lettre n\'appartient pas au mot recherché', counter: counter, playedLetter: playedLetter })
         }
     }
 
+    handleEndgame = () => {
+        console.log('Je fais quoi ici')
+        const { matchedLetter, lettersToFind, counter } = this.state;
+
+        if (matchedLetter.length === lettersToFind.length) {
+            this.setState({ message: `Bravo vous avez gagné la partie en ${counter} coups`})
+
+        } else {
+            this.setState( { message: `Perdu ! le mot a trouvé était ${lettersToFind}`});
+        }
+    }
 
     render() {
         const { lettersToFind, alphabet, message, counter } = this.state
