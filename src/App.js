@@ -25,7 +25,6 @@ class App extends React.Component {
         playedLetter: [],
         message: '',
         counter: 0,
-        end: false,
         newGame: false,
     }
     resetGame = () => {
@@ -36,7 +35,6 @@ class App extends React.Component {
             playedLetter: [],
             message: '',
             counter: 0,
-            end: false,
             newGame: false,
         })
     }
@@ -86,22 +84,24 @@ class App extends React.Component {
     handleEndgame = () => {
         const { matchedLetter, lettersToFind, counter} = this.state
         if (matchedLetter.length === lettersToFind.length) {
-            this.setState({ message: `Bravo vous avez gagné la partie en ${counter} coups`, end: false, newGame: true })
+            this.setState({ message: `Bravo vous avez gagné la partie en ${counter} coups`, newGame: true, counter: 0 })
 
         } else {
-            this.setState( { message: `Perdu ! le mot a trouvé était ${lettersToFind}`, end: false, newGame: true });
+            let word = lettersToFind.toString()
+            let cleanWord = word.replaceAll(',', '');
+            this.setState( { message: `Perdu ! le mot a trouvé était : ${cleanWord}`, newGame: true, counter: 0 });
         }
     }
 
 
 
     render() {
-        const { lettersToFind, alphabet, message, counter, end, newGame } = this.state
+        const { lettersToFind, alphabet, message, counter, newGame } = this.state
         return(
             <div className="pendu">
                 <p className="pendu__message">{ message }</p>
 
-                <span className="pendu__state-hidden">{ end && this.handleEndgame() }</span>
+                <span className="pendu__state-hidden">{ counter > 9 && this.handleEndgame() }</span>
                 <button className={ newGame ? "pendu__newGame" : "pendu__newGame-hidden"} onClick={this.resetGame}>Nouvelle partie ?</button>
                 <div className="pendu__mask">
                     {
