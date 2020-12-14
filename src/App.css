@@ -11,10 +11,23 @@
   width: 50%;
   height: 50vh;
 }
+.pendu__message {
+  height: 20px;
+}
+.pendu__state-hidden {
+  display: none;
+}
+.pendu__newGame {
+  text-decoration: none;
+}
+.pendu__newGame-hidden {
+  display: none;
+}
 .pendu__mask {
   display: flex;
   width: 100%;
   justify-content: center;
+  box-sizing: border-box;
 }
 
 .pendu__mask-letter {

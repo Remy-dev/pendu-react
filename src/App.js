@@ -25,7 +25,8 @@ class App extends React.Component {
         playedLetter: [],
         message: '',
         counter: 0,
-        win: null,
+        end: false,
+        newGame: false,
     }
 
     generateArrayAlphabet() {
@@ -45,16 +46,16 @@ class App extends React.Component {
 
     handleAlphabetClick = (index) => {
 
-        let { alphabet, lettersToFind, matchedLetter, counter, playedLetter } = this.state
-
-        if (10 >= counter ) {
-            this.handleEndgame();
-            console.log('JE suis ton père')
-        }
-
+        const { alphabet, lettersToFind, matchedLetter, playedLetter } = this.state
+        let { counter, end} = this.state
         let letter = alphabet[index];
 
-        if (playedLetter.includes(letter)) {
+        if (counter > 9) {
+
+            end = true
+            this.setState({end: end});
+
+        } else if (playedLetter.includes(letter)) {
 
             this.setState( { message: 'Cette lettre a déjà été jouée'});
 
@@ -72,22 +73,23 @@ class App extends React.Component {
     }
 
     handleEndgame = () => {
-        console.log('Je fais quoi ici')
-        const { matchedLetter, lettersToFind, counter } = this.state;
-
+        const { matchedLetter, lettersToFind, counter} = this.state
         if (matchedLetter.length === lettersToFind.length) {
-            this.setState({ message: `Bravo vous avez gagné la partie en ${counter} coups`})
+            this.setState({ message: `Bravo vous avez gagné la partie en ${counter} coups`, end: false, newGame: true })
 
         } else {
-            this.setState( { message: `Perdu ! le mot a trouvé était ${lettersToFind}`});
+            this.setState( { message: `Perdu ! le mot a trouvé était ${lettersToFind}`, end: false, newGame: true });
         }
     }
 
     render() {
-        const { lettersToFind, alphabet, message, counter } = this.state
+        const { lettersToFind, alphabet, message, counter, end, newGame } = this.state
         return(
             <div className="pendu">
-                <span className="pendu__message">{ message }</span>
+                <p className="pendu__message">{ message }</p>
+
+                <span className="pendu__state-hidden">{ end && this.handleEndgame() }</span>
+                <button className={ newGame ? "pendu__newGame" : "pendu__newGame-hidden"}><a href="/">Nouvelle partie ?</a></button>
                 <div className="pendu__mask">
                     {
                         lettersToFind.map((letter, index) =>(
