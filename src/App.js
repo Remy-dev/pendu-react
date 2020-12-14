@@ -28,7 +28,18 @@ class App extends React.Component {
         end: false,
         newGame: false,
     }
-
+    resetGame = () => {
+        this.setState({
+            lettersToFind: this.generateLetterArray(),
+            alphabet: this.generateArrayAlphabet(),
+            matchedLetter: [],
+            playedLetter: [],
+            message: '',
+            counter: 0,
+            end: false,
+            newGame: false,
+        })
+    }
     generateArrayAlphabet() {
         return ALPHABET.split('')
     }
@@ -82,6 +93,8 @@ class App extends React.Component {
         }
     }
 
+
+
     render() {
         const { lettersToFind, alphabet, message, counter, end, newGame } = this.state
         return(
@@ -89,7 +102,7 @@ class App extends React.Component {
                 <p className="pendu__message">{ message }</p>
 
                 <span className="pendu__state-hidden">{ end && this.handleEndgame() }</span>
-                <button className={ newGame ? "pendu__newGame" : "pendu__newGame-hidden"}><a href="/">Nouvelle partie ?</a></button>
+                <button className={ newGame ? "pendu__newGame" : "pendu__newGame-hidden"} onClick={this.resetGame}>Nouvelle partie ?</button>
                 <div className="pendu__mask">
                     {
                         lettersToFind.map((letter, index) =>(
