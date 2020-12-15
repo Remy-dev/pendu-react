@@ -1,14 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import './alphabet.css';
 
 const Alphabet = ({ alphabet, index, onClick }) => {
 
     return(
-    <div className={`pendu__piano-alphabet ${alphabet}`} onClick={() => onClick(index)}>
-        <span className="pendu__piano-alphabet symbol">
-            {alphabet}
-        </span>
-    </div>)
+    <button  className={`pendu__piano-alphabet ${alphabet}`} onClick={() => onClick(index)}>
+        { alphabet }
+    </button>)
 }
 Alphabet.propTypes = {
     alphabet: PropTypes.string.isRequired,

@@ -1,0 +1,9 @@
+.pendu__piano-alphabet {
+    width: 50px;
+    background-color: whitesmoke;
+    border-radius: 10px;
+    font-weight: bold;
+}
+.pendu__piano-alphabet:hover {
+    background-color: #61dafb;
+}

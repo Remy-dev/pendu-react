@@ -24,7 +24,6 @@ class App extends React.Component {
         playedLetter: [],
         messages: [],
         counter: 0,
-        newGame: false,
         end: false,
     };
 
@@ -36,7 +35,7 @@ class App extends React.Component {
             playedLetter: [],
             messages: [],
             counter: 0,
-            newGame: false,
+            end: false
         })
     };
     componentDidMount() {
@@ -71,28 +70,30 @@ class App extends React.Component {
 
     handleAlphabetClick = (index) => {
         const {end} = this.state;
+        let { counter } = this.state;
+        counter++;
         if (!end){
             const { alphabet } = this.state
             let letter = alphabet[index];
-            this.controlHint(letter);
+            this.controlHint(letter, counter);
         } else {
             this.setState({messages: [NEW]})
         }
     }
 
-    controlHint = (letter) => {
+    controlHint = (letter, counter) => {
 
         const { playedLetter, matchedLetter, lettersToFind } = this.state;
-        let { counter } = this.state;
-
-        if( counter > HINT) {
+        if( counter === HINT && lettersToFind.length !== matchedLetter.length ) {
+            console.log('hello')
             let word = lettersToFind.toString();
             let cleanWord = word.replaceAll(',', '');
             this.setState({end: true, messages: [LOOSE +  ` le mot a trouvé était : ${cleanWord}` ]});
         }
-
         if (playedLetter.includes(letter)) {
-
+            if ( counter > 0 ) {
+                counter--;
+            }
             this.setState( { messages: [HINT_SAME]});
 
         } else if (lettersToFind.includes(letter)) {
@@ -110,13 +111,10 @@ class App extends React.Component {
             }
 
             playedLetter.push(letter);
-
-            counter += 1;
             this.setState( { matchedLetter: matchedLetter, counter: counter, playedLetter: playedLetter })
 
         } else {
             playedLetter.push(letter);
-            counter += 1;
             this.setState( { messages: [HINT_ERROR] , counter: counter, playedLetter: playedLetter })
         }
     }
