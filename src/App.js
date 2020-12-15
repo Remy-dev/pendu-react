@@ -3,19 +3,18 @@ import React from "react";
 import shuffle from 'lodash.shuffle';
 import Letter from './Letter.js';
 import Alphabet from "./alphabet";
-const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-const WORDS = [
-    'AFFICHAGE',
-    'COMPREND',
-    'DEUX',
-    'PARTIES',
-    'DEVINETTE',
-    'SERIE',
-    'BOUTONS',
-    'ESSAI',
-    'RAISON'
-]
+import Messages from "./Messages";
 
+import {
+    HINT_ERROR,
+    HINT_SAME,
+    HINT,
+    WIN,
+    LOOSE,
+    ALPHABET,
+    WORDS,
+    NEW
+} from "./selector";
 
 class App extends React.Component {
     state = {
@@ -23,86 +22,110 @@ class App extends React.Component {
         alphabet: this.generateArrayAlphabet(),
         matchedLetter: [],
         playedLetter: [],
-        message: '',
+        messages: [],
         counter: 0,
         newGame: false,
-    }
+        end: false,
+    };
+
     resetGame = () => {
         this.setState({
             lettersToFind: this.generateLetterArray(),
             alphabet: this.generateArrayAlphabet(),
             matchedLetter: [],
             playedLetter: [],
-            message: '',
+            messages: [],
             counter: 0,
             newGame: false,
         })
+    };
+    componentDidMount() {
+       document.addEventListener("keydown", this.handleKeydown)
+
     }
+    componentWillUnmount() {
+        document.removeEventListener("keydown", this.handleKeydown)
+    }
+
+    handleKeydown = (event) => {
+
+       let lowerLetter = event.key;
+       let upperLetter = lowerLetter.toUpperCase();
+       this.controlHint(upperLetter);
+    }
+
     generateArrayAlphabet() {
         return ALPHABET.split('')
-    }
+    };
 
     generateLetterArray() {
         const crate = shuffle(WORDS)
         const word = crate.pop();
         return word.split('')
-    }
+    };
 
     getFeedbackForLetter(letter) {
         let {  matchedLetter } = this.state;
         return matchedLetter.includes(letter) ? 'visible' : 'hidden'
-    }
+    };
 
     handleAlphabetClick = (index) => {
+        const {end} = this.state;
+        if (!end){
+            const { alphabet } = this.state
+            let letter = alphabet[index];
+            this.controlHint(letter);
+        } else {
+            this.setState({messages: [NEW]})
+        }
+    }
 
-        const { alphabet, lettersToFind, matchedLetter, playedLetter } = this.state
-        let { counter, end} = this.state
-        let letter = alphabet[index];
+    controlHint = (letter) => {
 
-        if (counter > 9) {
+        const { playedLetter, matchedLetter, lettersToFind } = this.state;
+        let { counter } = this.state;
 
-            end = true
-            this.setState({end: end});
+        if( counter > HINT) {
+            let word = lettersToFind.toString();
+            let cleanWord = word.replaceAll(',', '');
+            this.setState({end: true, messages: [LOOSE +  ` le mot a trouvé était : ${cleanWord}` ]});
+        }
 
-        } else if (playedLetter.includes(letter)) {
+        if (playedLetter.includes(letter)) {
 
-            this.setState( { message: 'Cette lettre a déjà été jouée'});
+            this.setState( { messages: [HINT_SAME]});
 
         } else if (lettersToFind.includes(letter)) {
-            playedLetter.push(letter);
-            matchedLetter.push(letter);
-            counter += 1;
-            this.setState( { matchedLetter: matchedLetter, message: '', counter: counter, playedLetter: playedLetter })
-        } else {
+
+            lettersToFind.forEach((element) => {
+                if (element === letter )
+                {
+                    matchedLetter.push(letter);
+                }
+            })
+
+            if (lettersToFind.length === matchedLetter.length )
+            {
+                this.setState({end: true, messages:[WIN]})
+            }
 
             playedLetter.push(letter);
-            counter += 1;
-            this.setState( { message: 'Cette lettre n\'appartient pas au mot recherché', counter: counter, playedLetter: playedLetter })
-        }
-    }
 
-    handleEndgame = () => {
-        const { matchedLetter, lettersToFind, counter} = this.state
-        if (matchedLetter.length === lettersToFind.length) {
-            this.setState({ message: `Bravo vous avez gagné la partie en ${counter} coups`, newGame: true, counter: 0 })
+            counter += 1;
+            this.setState( { matchedLetter: matchedLetter, counter: counter, playedLetter: playedLetter })
 
         } else {
-            let word = lettersToFind.toString()
-            let cleanWord = word.replaceAll(',', '');
-            this.setState( { message: `Perdu ! le mot a trouvé était : ${cleanWord}`, newGame: true, counter: 0 });
+            playedLetter.push(letter);
+            counter += 1;
+            this.setState( { messages: [HINT_ERROR] , counter: counter, playedLetter: playedLetter })
         }
     }
-
-
 
     render() {
-        const { lettersToFind, alphabet, message, counter, newGame } = this.state
+        const { lettersToFind, alphabet, messages, counter } = this.state;
         return(
             <div className="pendu">
-                <p className="pendu__message">{ message }</p>
-
-                <span className="pendu__state-hidden">{ counter > 9 && this.handleEndgame() }</span>
-                <button className={ newGame ? "pendu__newGame" : "pendu__newGame-hidden"} onClick={this.resetGame}>Nouvelle partie ?</button>
+                <h1 className="pendu__title">P E N D U - react style</h1>
                 <div className="pendu__mask">
                     {
                         lettersToFind.map((letter, index) =>(
@@ -114,7 +137,6 @@ class App extends React.Component {
                             />
                         ) )
                     }
-
                 </div>
 
                 <div className="pendu__piano">
@@ -125,11 +147,25 @@ class App extends React.Component {
                                 index={index}
                                 key={index}
                                 onClick={this.handleAlphabetClick}
+
                             />
                         ))
                     }
                 </div>
-                <span className="pendu__counter">Nombre de coups { counter }</span>
+                <div className="pendu__info">
+                    <span className="pendu__info-counter">Nombre de coups { counter }</span>
+                    {
+                        messages.length > 0 && messages.map((message, index) => (
+                            <Messages
+                                message={message}
+                                Key={index}
+                            />
+                        ))
+                    }
+
+                </div>
+
+                <button className="pendu__newGame" onClick={this.resetGame}>Nouvelle partie</button>
             </div>
 
         )

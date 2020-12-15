@@ -7,16 +7,17 @@
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  border: 1px solid black;
   width: 50%;
   height: 50vh;
+  box-sizing: revert;
 }
-.pendu__message {
+.pendu__title {
+  height: content-box;
+}
+.pendu__messages {
   height: 20px;
 }
-.pendu__state-hidden {
-  display: none;
-}
+
 .pendu__newGame {
   text-decoration: none;
 }
@@ -43,6 +44,7 @@
   border: 1px solid black;
   background-color: #8959A8;
   border-radius: 10px;
+  box-sizing: border-box;
 
 }
 
@@ -56,6 +58,25 @@
 .pendu__piano-alphabet > .symbol {
   font-weight: bolder;
 }
+
+.pendu__info {
+  align-self: flex-start;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-family: "URW Gothic", serif;
+  font-weight: bold;
+}
+
+.pendu__info-counter {
+
+}
+
+.pendu__newGame {
+  height: auto;
+  align-self: flex-start;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
